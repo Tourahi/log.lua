@@ -7,12 +7,12 @@
 -- under the terms of the MIT license. See LICENSE for details.
 --
 
-local log = { _version = "0.1.0" }
+local log = { _version = "0.1.1" }
 
 log.usecolor = true
-log.outfile = nil
+log.outfile = 'log_out.log'
 log.level = "trace"
-
+log.ptf = false
 
 local modes = {
   { name = "trace", color = "\27[34m", },
@@ -23,6 +23,14 @@ local modes = {
   { name = "fatal", color = "\27[35m", },
 }
 
+log.printToFile = function(o)
+  o = o or false
+  log.ptf = o
+end
+
+log.logFileName = function(name)
+  log.outfile = name or log.outfile
+end
 
 local levels = {}
 for i, v in ipairs(modes) do
@@ -55,7 +63,7 @@ end
 for i, x in ipairs(modes) do
   local nameupper = x.name:upper()
   log[x.name] = function(...)
-    
+
     -- Return early if we're below the log level
     if i < levels[log.level] then
       return
@@ -74,15 +82,16 @@ for i, x in ipairs(modes) do
                         lineinfo,
                         msg))
 
-    -- Output to log file
-    if log.outfile then
-      local fp = io.open(log.outfile, "a")
-      local str = string.format("[%-6s%s] %s: %s\n",
-                                nameupper, os.date(), lineinfo, msg)
-      fp:write(str)
-      fp:close()
+    if log.ptf then
+      -- Output to log file
+      if log.outfile then
+        local fp = io.open(log.outfile, "a")
+        local str = string.format("[%-6s%s] %s: %s\n",
+                                  nameupper, os.date(), lineinfo, msg)
+        fp:write(str)
+        fp:close()
+      end
     end
-
   end
 end
 
