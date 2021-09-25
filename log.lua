@@ -14,6 +14,8 @@ log.outfile = nil
 log.level = "trace"
 log.ptf = false
 
+local concat = table.concat
+
 local modes = {
   { name = "trace", color = "\27[34m", },
   { name = "debug", color = "\27[36m", },
